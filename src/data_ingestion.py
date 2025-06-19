@@ -5,11 +5,16 @@ from telethon.sync import TelegramClient
 import asyncio
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 
 def load_config():
     with open('config.yaml', 'r') as f:
         return yaml.safe_load(f)
+
 
 async def fetch_messages(config):
     api_id = config['telegram']['api_id']
@@ -19,6 +24,7 @@ async def fetch_messages(config):
     client = TelegramClient('session_name', api_id, api_hash)
     await client.start()
     data = []
+
     for channel in channels:
         logging.info(f"Scraping {channel}")
         try:
@@ -33,7 +39,10 @@ async def fetch_messages(config):
                     'image_path': ''
                 }
                 if message.photo:
-                    image_path = f"data/images/telegram_images/{channel[1:]}_{message.id}.jpg"
+                    image_path = (
+                        f"data/images/telegram_images/"
+                        f"{channel[1:]}_{message.id}.jpg"
+                    )
                     await message.download_media(file=image_path)
                     msg_data['image_path'] = image_path
                 data.append(msg_data)
@@ -41,6 +50,7 @@ async def fetch_messages(config):
             logging.error(f"Error scraping {channel}: {e}")
     await client.disconnect()
     return data
+
 
 if __name__ == "__main__":
     config = load_config()
