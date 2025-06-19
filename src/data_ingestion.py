@@ -4,17 +4,17 @@ import pandas as pd
 from telethon.sync import TelegramClient
 import asyncio
 import logging
+import nest_asyncio  # Add this import
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-
 def load_config():
-    with open('config.yaml', 'r') as f:
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
+    with open(config_path, 'r') as f:
         return yaml.safe_load(f)
-
 
 async def fetch_messages(config):
     api_id = config['telegram']['api_id']
@@ -51,10 +51,24 @@ async def fetch_messages(config):
     await client.disconnect()
     return data
 
-
-if __name__ == "__main__":
+async def main():
     config = load_config()
-    messages = asyncio.run(fetch_messages(config))
+    messages = await fetch_messages(config)
     df = pd.DataFrame(messages)
+    os.makedirs('data/raw', exist_ok=True)
     df.to_csv('data/raw/telegram_data.csv', index=False, encoding='utf-8')
     logging.info(f"Collected {len(df)} messages")
+
+if __name__ == "__main__":
+    # Apply nest_asyncio to allow nested event loops
+    nest_asyncio.apply()
+    
+    # Get or create event loop
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
+    # Run the main function
+    loop.run_until_complete(main())
