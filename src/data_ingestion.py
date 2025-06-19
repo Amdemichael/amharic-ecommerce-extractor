@@ -6,24 +6,29 @@ import asyncio
 import logging
 import nest_asyncio
 
-
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-
 def load_config():
-    config_path = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
+    # Adjust path to access config.yaml from the notebooks directory
+    config_path = os.path.join('..', 'config.yaml')  # Path to the parent directory
+    if not os.path.isfile(config_path):
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+    
     with open(config_path, 'r') as f:
         return yaml.safe_load(f)
-
 
 async def fetch_messages(config):
     api_id = config['telegram']['api_id']
     api_hash = config['telegram']['api_hash']
     channels = config['channels']
-    os.makedirs('data/images/telegram_images', exist_ok=True)
+    
+    # Ensure directories exist
+    os.makedirs('../data/images/telegram_images', exist_ok=True)
+    
     client = TelegramClient('session_name', api_id, api_hash)
     await client.start()
     data = []
@@ -42,8 +47,8 @@ async def fetch_messages(config):
                     'image_path': ''
                 }
                 if message.photo:
-                    image_path = (
-                        f"data/images/telegram_images/"
+                    image_path = os.path.join(
+                        '../data/images/telegram_images',
                         f"{channel[1:]}_{message.id}.jpg"
                     )
                     await message.download_media(file=image_path)
@@ -54,19 +59,19 @@ async def fetch_messages(config):
     await client.disconnect()
     return data
 
-
 async def main():
     config = load_config()
     messages = await fetch_messages(config)
     df = pd.DataFrame(messages)
-    os.makedirs('data/raw', exist_ok=True)
-    df.to_csv('data/raw/telegram_data.csv', index=False, encoding='utf-8')
+    
+    # Ensure raw data directory exists
+    os.makedirs('../data/raw', exist_ok=True)
+    df.to_csv('../data/raw/telegram_data.csv', index=False, encoding='utf-8')
     logging.info(f"Collected {len(df)} messages")
-
 
 if __name__ == "__main__":
     nest_asyncio.apply()
-
+    
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:

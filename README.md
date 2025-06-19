@@ -48,7 +48,19 @@ mkdir -p models/xlm_roberta models/distilbert models/mbert models/checkpoints
 mkdir -p notebooks docs results/shap_plots results/lime_reports
 ```
 
+# Task 1: Data Ingestion and Preprocessing
 
+This notebook implements Task 1 for the Amharic E-commerce Data Extractor project. It fetches messages from Ethiopian Telegram e-commerce channels, preprocesses the data, and stores it in a structured format.
+
+## Objectives
+- Scrape messages from 5 Telegram channels ('@ZemenExpress', '@nevacomputer', '@aradabrand2', '@ethio_brand_collection', '@modernshoppingcenter').
+- Collect text, images, and metadata (message_id, timestamp, views, sender).
+- Preprocess Amharic text (remove emojis, normalize currency).
+- Save data to `data/raw/telegram_data.csv` and `data/processed/telegram_data_final.csv`.
+
+## Setup
+- Requires `telethon`, `pandas`, `pyyaml`.
+- Uses `config.yaml` for Telegram API credentials.
 
 
 

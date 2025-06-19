@@ -40,12 +40,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '--input',
-        default='data/raw/telegram_data.csv',
+        default='../data/raw/telegram_data.csv',
         help='Input CSV path'
     )
     parser.add_argument(
         '--output',
-        default='data/processed/telegram_data_final.csv',
+        default='../data/processed/telegram_data_final.csv',
         help='Output CSV path'
     )
     args = parser.parse_args()
