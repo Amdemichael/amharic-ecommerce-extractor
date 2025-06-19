@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Telegram session files
+*.session
+*.session-journal
+
+# Large data files
+data/raw/*
+data/processed/*
+data/images/*
+data/external/amharic_ner_dataset.csv
+
+# Large model files
+models/*
+checkpoints/*
+
+# Environment
+venv/
+.env
+.venv/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Sensitive configuration
+config.yaml
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+
+# GitHub Actions cache
+.cache/

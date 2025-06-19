@@ -1,0 +1,126 @@
+name: CI/CD for Amharic E-commerce Extractor
+
+# Trigger the workflow on push or pull request to main branch, or on tagged releases
+on:
+ push:
+ branches: [ main ]
+ pull_request:
+ branches: [ main ]
+ release:
+ types: [ published ]
+
+jobs:
+ ci:
+ name: Continuous Integration
+ runs-on: ubuntu-latest
+
+ steps:
+ # Checkout the repository
+ - name: Checkout code
+ uses: actions/checkout@v4
+
+ # Set up Python 3.10
+ - name: Set up Python
+ uses: actions/setup-python@v5
+ with:
+ python-version: '3.10'
+
+ # Cache dependencies
+ - name: Cache dependencies
+ uses: actions/cache@v4
+ with:
+ path: ~/.cache/pip
+ key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+ restore-keys: |
+ ${{ runner.os }}-pip-
+
+ # Install dependencies
+ - name: Install dependencies
+ run: |
+ python -m pip install --upgrade pip
+ pip install -r requirements.txt
+ pip install flake8 pytest pytest-cov
+
+ # Lint code with flake8
+ - name: Lint with flake8
+ run: |
+ flake8 src/ --max-line-length=88 --extend-ignore=E203
+
+ # Run unit tests with pytest
+ - name: Run tests
+ run: |
+ pytest tests/ --cov=src --cov-report=xml
+ env:
+ # Mock Telegram API keys for testing
+ TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+ TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+ TELEGRAM_PHONE: ${{ secrets.TELEGRAM_PHONE }}
+
+ # Upload coverage report (optional)
+ - name: Upload coverage report
+ uses: codecov/codecov-action@v4
+ with:
+ files: ./coverage.xml
+ token: ${{ secrets.CODECOV_TOKEN }}
+ if: success()
+
+ # Validate data processing output (e.g., CSV schema)
+ - name: Validate processed data
+ run: |
+ python src/preprocess.py --validate
+ env:
+ TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+ TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+ TELEGRAM_PHONE: ${{ secrets.TELEGRAM_PHONE }}
+
+ cd:
+ name: Continuous Deployment
+ runs-on: ubuntu-latest
+ needs: ci # Run only if CI passes
+ if: github.event_name == 'release' # Run only on tagged releases
+
+ steps:
+ # Checkout the repository
+ - name: Checkout code
+ uses: actions/checkout@v4
+
+ # Set up Python 3.10
+ - name: Set up Python
+ uses: actions/setup-python@v5
+ with:
+ python-version: '3.10'
+
+ # Install dependencies
+ - name: Install dependencies
+ run: |
+ pip install -r requirements.txt
+
+ # Build deliverables (e.g., validate data, generate placeholder reports)
+ - name: Build deliverables
+ run: |
+ python src/data_ingestion.py
+ python src/preprocess.py
+ # Placeholder: Generate interim report (e.g., via pandoc if Markdown exists)
+ # pandoc docs/interim_report.md -o docs/interim_report.pdf
+
+ # Archive deliverables as artifacts
+ - name: Archive deliverables
+ uses: actions/upload-artifact@v4
+ with:
+ name: deliverables
+ path: |
+ docs/*.pdf
+ docs/channels.txt
+ results/*.csv
+ data/processed/telegram_data_final.csv
+
+ # Optional: Upload models to AWS S3 (placeholder for Task 3+)
+ - name: Upload models to S3
+ if: github.event_name == 'release'
+ env:
+ AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+ AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+ run: |
+ pip install awscli
+ aws s3 cp models/xlm_roberta s3://your-bucket/models/xlm_roberta/ --recursive
+ continue-on-error: true # Allow workflow to continue if S3 upload fails
