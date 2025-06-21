@@ -43,7 +43,7 @@ async def fetch_messages(config):
                 msg_data = {
                     'message_id': message.id,
                     'channel': channel,
-                    'text': message.text if message.text else '',
+                    'message': message.text if message.text else '',
                     'timestamp': message.date,
                     'views': message.views if message.views else 0,
                     'sender': message.sender_id if message.sender_id else 'unknown',
