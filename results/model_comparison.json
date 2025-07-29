@@ -1,0 +1,9 @@
+{
+  "xlm-roberta-base": {
+    "train_loss": 0.6098775333828397,
+    "eval_f1": 0.0,
+    "eval_precision": 0.0,
+    "eval_recall": 0.0,
+    "eval_accuracy": 0.9712292938099389
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "high_priority": [
+    {
+      "channel": "ethio_brand_collection",
+      "lending_score": 84.92,
+      "strengths": [
+        "High engagement",
+        "Consistent activity",
+        "Product diversity"
+      ],
+      "concerns": [],
+      "recommended_loan_amount": 37401,
+      "risk_level": "low"
+    }
+  ],
+  "medium_priority": [],
+  "low_priority": [],
+  "summary": {
+    "total_vendors": 1,
+    "high_priority_count": 1,
+    "medium_priority_count": 0,
+    "low_priority_count": 0,
+    "avg_lending_score": 84.92,
+    "total_recommended_loan_amount": 37401
+  }
+}

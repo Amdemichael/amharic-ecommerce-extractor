@@ -1,0 +1,12 @@
+{
+  "model_path": "../models/xlm-roberta-base",
+  "total_texts_analyzed": 5,
+  "difficult_cases_count": 5,
+  "shap_explanations_count": 0,
+  "lime_explanations_count": 0,
+  "difficult_cases_summary": {
+    "missing_product_detection": 5,
+    "missing_price_detection": 4,
+    "incomplete_entities": 0
+  }
+}
